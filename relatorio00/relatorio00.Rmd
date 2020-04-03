@@ -1,0 +1,170 @@
+---
+title: "Relatório 1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Alunos: André Gomes Regino (RA 230252) e Gustavo Caetano Borges (RA 262883)
+
+## Variáveis de Entrada
+
+```{r variaveis}
+a1 <- read.csv(file = "a1.csv", header = FALSE, sep = ";", dec = ".")
+a1 <- a1[,1]
+b1 <- read.csv(file = "b1.csv", header = FALSE, sep = ";", dec = ".")
+b1 <- b1[,1]
+a1
+b1
+paired <- read.csv(file = "paired.csv", header = FALSE, sep = ",", dec = ".")
+col1 <- paired[,1]
+col2 <- paired[,2]
+col1
+col2
+
+
+```
+## Exercício 1
+
+Os arquivos a1.csv e b1.csv contém um conjunto de medidas cada um.
+
+Use os seguintes testes
+
+* teste t
+
+* Wilcoxon rank sum
+
+```{r exercicio1}
+
+t.test(a1,b1) #teste t
+wilcox.test(a1,b1) #wilcoxon rank sum
+```
+
+## Exercício 2
+
+Gere um histograma dos dois dados e verifique se eles “se parecem” com Gaussianas. Tendo em vista esse resultado e o tamanho dos dados, quais dos dois valores de p-valor voce deve confiar. Eu não acho que há uma resposta correta para essa pergunta, mas eu gostaria de saber seus argumentos para a sua resposta
+
+```{r exercicio2}
+hist(a1, breaks = 9)
+hist(a1, breaks = 12)
+hist(b1, breaks = 9)
+hist(b1, breaks = 12)
+
+```
+
+#### Resposta
+
+Dado os histogramas, não há semelhança com Gaussianas.
+Em nossa opinião, deve-se confiar menos no p-valor do teste T. O teste T assume que os dados são uma gaussiana e que há mais de 30 dados no conjunto. Isso não é verdade para o experimento apresentado, uma vez que há menos do que 30 dados no conjunto (13 e 15 dados, respectivamente) e, segundo o histograma apresentado acima, não há semelhança com gaussianas. O teste Wilcoxon faz menos pressuposições, então, seu valor deve ser mais próxima da realidade do que o teste T, no experimento em questão.
+
+## Exercício 3
+
+O arquivo paired.csv contem um conjunto de dados pareados, onde cada coluna é um grupo e as linhas o pareamento.
+
+Rode os seguintes algoritmos
+
+* teste t pareado
+* Wilcoxon signed rank (a versão pareada do Wilcoxon sum rank).
+
+Compare os dos p-valores. Discuta se voce tem uma opinião sobre quais dos dois usar. De novo eu não sei se há uma resposta certa para essa pergunta.
+
+
+
+```{r exercicio3}
+t.test(col1, col2, paired = TRUE) #teste t pareado
+wilcox.test(col1, col2, paired = TRUE) # wilcoxon pareado
+```
+
+#### Resposta
+
+Em nossa opinião, novamente não podemos confiar no teste T, pois os dados não satisfazem as pressuposições deste teste. O histograma mostra que não se forma curva gaussiana com os dados e o conjunto de dados é muito pequeno. Dessa forma, o wilcoxon pode ter um resultado de p-value um pouco mais aproximado da realidade.
+
+## Exercício 4
+
+Rode a versão não pareada do teste t e do Wilcoxon. A versão não pareada deve ser mais fraca (poder menor - maior p-valor) que as versões pareadas dos algoritmos. Verifique que isso é verdade.
+
+```{r exercicio4}
+t.test(col1, col2, paired = FALSE)
+wilcox.test(col1, col2, paired = FALSE)
+```
+
+#### Resposta
+
+Os p-valores das versões não pareadas (t = 0,1402 e wilcoxon = 0.1984) são, de fato, maiores do que os p-valores das versões pareadas (t = 0,00465 e wilcoxon = 0,00976).
+
+## Exercício 5
+
+Gere 2 conjuntos de 15 dados amostrados de uma normal de media 10 e 13, ambos com desvio padrão de 5.
+
+Calcule a media do p-valor usando o teste t para 50 repetições dos pares descritos acima.
+
+```{r exercicio5}
+mediap=0
+for(i in 1:50){
+	set1 = rnorm(15, 10, 5)
+	set2 = rnorm(15, 13, 5)
+  	mediap[i] = t.test(set1,set2)[3]
+}
+mediap <- unlist(mediap)
+mean(mediap)
+```
+
+
+
+## Exercício 6
+
+Calcule a media do p-valor para o teste t para 50 repetições dos pares acima, mas com 25 dados cada
+
+```{r exercicio6}
+mediap1=0
+for(i in 1:50){
+	set1 = rnorm(25, 10, 5)
+	set2 = rnorm(25, 13, 5)
+  	mediap1[i] = t.test(set1,set2)[3]
+}
+mediap1 <- unlist(mediap1)
+mean(mediap1)
+```
+
+## Exercício 7
+
+Calcule a media do p-valor para o teste t para 50 repetições dos pares acima, com 15 dados cada mas com 10 como desvio padrão
+
+```{r exercicio7}
+mediap2=0
+for(i in 1:50){
+	set1 = rnorm(15, 10, 10)
+	set2 = rnorm(15, 13, 10)
+  	mediap2[i] = t.test(set1,set2)[3]
+}
+mediap2 <- unlist(mediap2)
+mean(mediap2)
+```
+
+## Exercício 8
+
+Calcule a media do p-valor para o teste t para 50 repetições dos pares acima, com 15 dados, 5 de desvio padrão mas com medias 10 e 17.
+
+```{r exercicio8}
+mediap3=0
+for(i in 1:50){
+	set1 = rnorm(15, 10, 5)
+	set2 = rnorm(15, 17, 5)
+  	mediap3[i] = t.test(set1,set2)[3]
+}
+mediap3 <- unlist(mediap3)
+mean(mediap3)
+```
+
+## Exercício 9
+Discuta a influencia dos 3 fatores no p-valor: numero de dados, ruído dos dados (o desvio padrão das fontes) e “tamanho da diferença” entre as fontes (diferença entre as médias)
+
+#### Resposta
+
+* **Número de dados:** Identificamos que quanto maior o número de dados (no exercício em questão), menor o p-valor. Exemplo: em uma das execuções, com 15 dados, obtivemos média de p-valores 0.1884612 e com 25 dados obtivemos média de p-valores 0.134518.
+
+* **Rúido dos dados:** Identificamos que quanto maior o desvio padrão, maior o p-valor. Exemplo: em uma das execuções, com desvio padrão de 5, obtivemos média de p-valores 0.1884612 e com desvio padrão de 10 obtivemos média de p-valores 0.3657076.
+
+* **Diferença entre fontes:** Identificamos que quanto maior a diferença entre as médias, menor o p-valor. Exemplo: em uma das execuções, com diferença entre as médias de 3 (10 e 13), obtivemos média de p-valores 0.1884612 e com diferenças de médias de 7 (10 e 17), obtivemos média de p-valores 0.003102274.

@@ -1,0 +1,12 @@
+name: "statistics-with-r"
+output_dir: "docs"
+navbar:
+  title: "Statistics with R"
+  left:
+  - text: "Home"
+    href: index.html
+  - text: "Aula 1"
+    href: relatorio00/relatorio00.html
+output:
+  html_document:
+theme: cosmo
